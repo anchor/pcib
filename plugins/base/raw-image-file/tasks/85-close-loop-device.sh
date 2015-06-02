@@ -1,0 +1,1 @@
+run_cleanups cleanup_loopback_image_file

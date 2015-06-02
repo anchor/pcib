@@ -1,0 +1,7 @@
+[Unit]
+Description=Establish communication with the metadata server
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/share/avf/bin/connect-to-mds

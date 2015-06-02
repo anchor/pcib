@@ -1,0 +1,27 @@
+PCIB - The Penultimate Cloud Image Builder
+------------------------------------------
+
+PCIB is a cloud image builder based on UCIB (the Ultimate Cloud Image
+Builder) by Matt Palmer. While it retains the same extensible plugin
+architecture as UCIB, there are several important design changes:
+
+ - PCIB does not care what host OS you're building an image on, and
+   will not try to install any packages on your system for you. Rather,
+   it will complain and die if it can't find a command it needs. This
+   both simplifies the codebase and leaves your system's administration
+   in the hands of the best person for the job: you.
+
+ - PCIB has abandoned the concept of a monolithic "cloud" plugin that
+   does everything you need for a particular cloud platform. In
+   actuality, many cloud platforms are made up of a large number of
+   small subsystems, many of which are common between multiple
+   platforms.
+
+   To best support this, PCIB can accept options in a config file as
+   well as on the command line, and each "cloud" is now represented in
+   an example config file in examples/.
+
+ - New contributions to PCIB are licensed under a permissive licence
+   (ISC-style preferred). UCIB is licensed under GPLv3, and much of the
+   code in PCIB is taken from UCIB, but new contributions under the GPL
+   will not be accepted.

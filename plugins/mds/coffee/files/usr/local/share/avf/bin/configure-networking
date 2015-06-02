@@ -1,0 +1,142 @@
+#!/bin/bash
+
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+. /usr/local/share/avf/lib/functions
+
+nicparam() {
+	local nic="$1"
+	local param="$2"
+
+	mds network/interfaces/"$nic"/"$param"
+}
+
+write_interface_cfg_rhel() {
+	ENI=/etc/sysconfig/network-scripts/ifcfg-"$nic"
+
+	if [ -e "$ENI" ]; then
+		# This NIC is already configured... cool
+		return
+	fi
+
+	log "Configuring $nic"
+
+	if [ -n "$ip4" ]; then
+		cat >"$ENI" <<-EOF
+		DEVICE=$nic
+		ONBOOT=yes
+		IPADDR=$ip4
+		NETMASK=$netmask
+		GATEWAY=$gw
+		EOF
+
+		if [ -n "$gw" ]; then
+			echo "GATEWAY=$gw" >>"$ENI"
+		fi
+	elif [ -n "$ip6" ]; then
+		cat >>"$ENI" <<-EOF
+		IPV6INIT=yes
+		IPV6ADDR=$ip6
+		IPV6_DEFAULTGW=$gw
+		EOF
+	fi
+
+	log "Starting $nic"
+	/sbin/ifup "$nic"
+
+	return
+}
+
+write_interface_cfg_debian() {
+	if grep -q "^iface $nic " "$ENI"; then
+		# This NIC is already configured... cool
+		return
+	fi
+
+	log "Configuring $nic"
+
+	if [ -n "$ip4" ]; then
+		cat >>"$ENI" <<-EOF
+
+		auto $nic
+		iface $nic inet static
+			address $ip4
+			netmask $netmask
+		EOF
+	elif [ -n "$ip6" ]; then
+		cat >>"$ENI" <<-EOF
+
+		auto $nic
+		iface $nic inet6 static
+			address $ip6
+			netmask $netmask
+		EOF
+	fi
+
+	if [ -n "$gw" ]; then
+		echo "	gateway $gw" >>"$ENI"
+	fi
+
+
+	log "Starting ${nic}"
+	/sbin/ifup "$nic"
+
+	return
+}
+
+# Basic OS check
+if [ -e /etc/debian_version ]; then
+	os=debian
+elif [ -e /etc/redhat-release ]; then
+	os=rhel
+else
+	log "Unknown operating system"
+	exit 1
+fi
+
+log "Operating system is \"$os\""
+
+mds network/hostname >/etc/hostname
+hostname -F /etc/hostname
+grep '^127.0.1.1 ' /etc/hosts || echo "127.0.1.1 $(cat /etc/hostname) $(hostname -s)" >>/etc/hosts
+
+# A resolv.conf is always useful
+echo "domain $(cat /etc/hostname | sed 's/^[^.]*\.//')" >/etc/resolv.conf
+for ns in $(mds network/resolvers); do
+	echo "nameserver $ns" >>/etc/resolv.conf
+done
+
+if [ "$os" == debian ]; then
+	ENI=/etc/network/interfaces
+elif [ "$os" == rhel ]; then
+	ENI="/etc/sysconfig/network"
+
+	cat >"$ENI" <<-EOF
+	NETWORKING=yes
+	HOSTNAME=$(hostname)
+	EOF
+fi
+
+# Hokay, what NICs have we got?
+niclist="$(mds network/interfaces | sed 's%/$%%')"
+
+for nic in $niclist; do
+	ip4="$(nicparam "$nic" ip4)"
+	ip6="$(nicparam "$nic" ip6)"
+	gw="$(nicparam "$nic" gateway)"
+
+	if [ -n "$ip4" ]; then
+		netmask="$(nicparam "$nic" netmask)"
+	elif [ -n "$ip6" ]; then
+		netmask="$(nicparam "$nic" masklen)"
+	fi
+
+	if [ "$os" == debian ]; then
+		write_interface_cfg_debian
+	elif [ "$os" == rhel ]; then
+		write_interface_cfg_rhel
+	fi
+done
+
+has_run configure-networking
+:

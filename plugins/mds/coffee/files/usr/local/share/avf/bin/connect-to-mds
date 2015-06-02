@@ -1,0 +1,32 @@
+#!/bin/bash
+
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+. /usr/local/share/avf/lib/functions
+
+# Tell IPv6 to accept our specific route RAs
+log "Setting max prefix length to /64"
+for i in /proc/sys/net/ipv6/conf/*; do
+	echo 64 >"$i"/accept_ra_rt_info_max_plen
+done
+
+# We've got to activate all NICs, so that we can maximise our chances of
+# talking to the MDS
+for iface in $(ip li sh | grep -Eo ' eth[0-9]+'); do
+	log "Bringing up $iface"
+	ip link set "$iface" up
+done
+
+# We'll wait a little while to see if we get a route, but not forever
+i=0
+while [ $i -lt 10 ]; do
+	if ip -6 ro sh | grep -q '^fc0f::/64'; then
+		log "Found route to MDS"
+		exit 0
+	fi
+	i=$(($i+1))
+	sleep 1
+done
+
+log "Failed to find route to MDS. Giving up."
+exit 1

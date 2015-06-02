@@ -1,0 +1,16 @@
+[Unit]
+Description=Retrieve SSH user keys and seed root's authorized_keys
+ConditionPathExists=!/var/local/lib/avf/has-run/install-root-ssh-keys
+Wants=avf-connect-to-mds.service
+After=avf-connect-to-mds.service
+# Since if we install keys, we'll disable password auth as root, we
+# need to run before ssh.service so it picks up our modified config.
+Before=ssh.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/share/avf/bin/install-root-ssh-keys
+
+[Install]
+WantedBy=multi-user.target

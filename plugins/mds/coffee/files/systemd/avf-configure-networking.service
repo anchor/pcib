@@ -1,0 +1,15 @@
+[Unit]
+Description=Configure any network interface that isn't already
+ConditionPathExists=!/var/local/lib/avf/has-run/configure-networking
+Wants=avf-connect-to-mds.service
+After=avf-connect-to-mds.service
+Before=network-pre.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/share/avf/bin/configure-networking
+
+[Install]
+WantedBy=multi-user.target
+Wants=network-pre.target

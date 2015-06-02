@@ -1,0 +1,34 @@
+#!/bin/bash
+
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+. /usr/local/share/avf/lib/functions
+
+ssh_dir=/root/.ssh
+authorized_keys="$ssh_dir"/authorized_keys
+
+mkdir -p "$ssh_dir" -m 0700
+
+# We need to distinguish between a failed response (the MDS returned an
+# error) and a successful empty response (there are no SSH keys to
+# install). Therefore, we test the exit status of wget rather than
+# check if $pklist is empty.
+pklist="$(mds public_keys)" || {
+	log "Failed to get SSH keys from MDS"
+	exit 1
+}
+
+disable_password_auth=no
+
+for pk in $pklist; do
+	mds "public_keys/$pk/openssh-key" >>"$authorized_keys"
+	log "Added public key $pk to root account"
+	disable_password_auth=yes
+done
+
+if [ "$disable_password_auth" = yes ]; then
+	sed -i 's/^PermitRootLogin yes$/PermitRootLogin without-password/' /etc/ssh/sshd_config
+fi
+
+has_run install-root-ssh-keys
+:

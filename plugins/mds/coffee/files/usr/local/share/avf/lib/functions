@@ -1,0 +1,26 @@
+if grep -q avfdebug /proc/cmdline; then
+	set -x
+	trap "sleep 10" EXIT
+fi
+
+MDS="http://[fc0f::fee]/2013-09-14/"
+
+mds() {
+	wget -qO - $MDS/$1
+}
+
+log() {
+	if [ -z "$RUNNING_FROM_SYSVINIT" ]; then
+		# systemd will do the right thing with stdout.
+		echo "$@"
+	else
+		logger -t "$(basename $0)" "$@"
+	fi
+}
+
+has_run() {
+	mkdir -p /var/local/lib/avf/has-run
+	touch /var/local/lib/avf/has-run/"$1"
+}
+
+# vim: ft=sh

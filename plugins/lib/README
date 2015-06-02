@@ -1,0 +1,5 @@
+These "plugins" exist not to perform any useful work on their own, but
+to provide specialised shell library routines for the use of other
+plugins. General-purpose library routines should go in lib/ (not
+plugins/lib/) where they can be loaded at startup time; these libraries
+do not get loaded unless requested by another plugin.

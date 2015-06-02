@@ -1,0 +1,13 @@
+[Unit]
+Description=Generate ssh host keys if they do not exist
+ConditionPathExists=!/etc/ssh/ssh_host_rsa_key
+ConditionPathExists=!/etc/ssh/ssh_host_dsa_key
+Before=ssh.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/ssh-keygen -A
+
+[Install]
+WantedBy=ssh.service

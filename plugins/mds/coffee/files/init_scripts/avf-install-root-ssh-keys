@@ -1,0 +1,29 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:       avf-install-root-ssh-keys
+# Required-Start: avf-configure-networking
+# Required-Stop:  
+# Should-Start:   
+# Should-Stop:    
+# Default-Start:  2 3 4 5
+# Default-Stop:   0 1 6
+# Description:    Retrieve SSH user keys and seed root's authorized_keys
+### END INIT INFO
+# chkconfig: 123 99 99
+
+if [ -f /var/local/lib/avf/has-run/install-root-ssh-keys ]; then
+	exit 0
+fi
+
+export RUNNING_FROM_SYSVINIT=yes
+
+case "$1" in
+	start)
+		exec /usr/local/share/avf/bin/install-root-ssh-keys
+		;;
+	*)
+		# Do nothing.
+		;;
+esac
+
+:
