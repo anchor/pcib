@@ -1,7 +1,7 @@
 base_raw_image_file_usage() {
 	usage_section "Raw image file"
 
-	usage_description
+	usage_description \
 		"This plugin provides a raw image file for platform plugins to"  \
 		"work their magic in."
 
@@ -10,7 +10,7 @@ base_raw_image_file_usage() {
 
 	usage_option "image-dir" \
 		"Specify the directory to place resultant images in. (default:"  \
-		"/var/cache/pcib/images)"
+		"\${basedir}/images)"
 
 	usage_option "image-basename" \
 		"Specify the basename to use for the image. This will have the"  \
@@ -25,7 +25,7 @@ base_raw_image_file_usage() {
 register_usage base_raw_image_file_usage
 
 parseopt image-size true 3
-parseopt image-dir true /var/cache/pcib/images
+parseopt image-dir true "$BASEDIR"/images
 parseopt image-basename true avf
 parseopt compress true
 

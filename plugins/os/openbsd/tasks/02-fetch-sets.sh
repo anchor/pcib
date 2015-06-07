@@ -12,7 +12,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-SETDIR=/var/cache/pcib/openbsd/"$(optval release)"/"$(optval arch)"
+SETDIR="$BASEDIR"/openbsd/"$(optval release)"/"$(optval arch)"
 mkdir -p "$SETDIR"
 
 for set in SHA256.sig $sets "$(optval kernel)" bsd.rd; do

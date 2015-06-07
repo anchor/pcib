@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+
+# Copyright (c) 2015 Steven McDonald <steven@steven-mcdonald.id.au>
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+set -e
+set -o pipefail
+
+# Asking "where is my binary located?" is inherently non-portable in
+# shell. This implementation uses only base perl modules, which should
+# be available everywhere.
+ROOT="$(
+	perl -MCwd=abs_path -MFile::Basename=dirname -e 'print dirname dirname abs_path $ARGV[0]' \
+		"$(which "$0")"
+)"
+. "$ROOT"/lib/functions.sh
+
+ARGV=("$@")
+CONFIG_ARGV=()
+
+# Options that should only ever be specified on the command line, and
+# thus come before config file parsing.
+parseopt debug
+parseopt help
+
+if optval debug &>/dev/null; then
+	DEBUG=y
+fi
+
+if [ "${#ARGV[@]}" -eq 1 ]; then
+	ARGV=(--config "${ARGV[@]}")
+fi
+
+parseopt config true
+if optval config &>/dev/null; then
+	config="$(optval config)"
+	[ -e "$config" ] || fatal "Config file does not exist: $config"
+	[ -f "$config" ] || fatal "Not a regular file: $config"
+	[ -r "$config" ] || fatal "No read permission: $config"
+	while IFS='=' read key value; do
+		CONFIG_ARGV=("${CONFIG_ARGV[@]}" --"$key" "$value")
+	done < <(grep -Ev '^[[:space:]]*(#|$)' "$(optval config)")
+fi
+
+load_plugin_or_die base/pcib
+
+parseopt os true
+if ! optval os &>/dev/null; then
+	fatal "Required option 'os' not provided."
+fi
+load_plugin_or_die os/"$(optval os)"
+
+parseopt plugin true
+while optval plugin &>/dev/null; do
+	load_plugin_or_die "$(optval plugin)"
+	parseopt plugin true
+done
+
+if optval help &>/dev/null; then
+	usage
+	exit 0
+fi
+
+trap 'error "An error occurred. Cleaning up..."; run_cleanups' EXIT
+
+run_tasks
+BUILD_COMPLETE=1
+
+run_cleanups
+trap '' EXIT
+exit 0

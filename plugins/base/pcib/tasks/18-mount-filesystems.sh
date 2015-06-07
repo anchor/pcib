@@ -1,30 +1,36 @@
-# The list of mount points, in shortest-to-longest order, so we mount them
-# correctly inside one another
-mount_list=($(for k in "${!PARTITIONS[@]}"; do echo "$k"; done | awk '{ print length(), $1 }' | sort -n | cut -d ' ' -f 2))
+# Copyright (c) 2015 Steven McDonald <steven@steven-mcdonald.id.au>
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-debug "Mount list is ${mount_list[@]}"
+cleanup_mount_filesystems() {
+	local unmount_order
+	readarray -t unmount_order < <(perl -e 'print join "\n", sort { length $b <=> length $a } @ARGV' "${!PARTITIONS[@]}")
 
-cleanup_mount_filesystem() {
-	[ "$unmount_safely" = safe ] || warning "Performing unsafe unmounts"
-	while [ "${#mount_list[@]}" -gt "0" ]; do
-		p="${mount_list[-1]}"
-		unset mount_list[${#mount_list[@]}-1]
-		debug "Unmounting '$TARGET$p'"
-		unmount_filesystem "$TARGET$p" "$unmount_safely"
+	for p in "${unmount_order[@]}"; do
+		unmount_filesystem "$TARGET""$p" "$unmount_safely"
 	done
 }
 
-unmount_safely=
-register_cleanup cleanup_mount_filesystem
+register_cleanup cleanup_mount_filesystems
 
-for part in "${mount_list[@]}"; do
-	if ! [[ "$part" =~ ^/ ]]; then
-		# Not a mountable filesystem
-		continue
-	fi
+TARGET="$WORKSPACE"/target
 
-	mkdir -p "${TARGET}${part}"
-	debug "Mounting '${PARTITIONS[$part]}' on '${TARGET}${part}'"
+for p in "${!PARTITIONS[@]}"; do
+	case "$p" in
+		/*) ;;
+		*) continue ;;
+	esac
 
-	mount_filesystem "${PARTITIONS[$part]}" "${TARGET}${part}"
+	mkdir -p "$TARGET""$p"
+	mount_filesystem "${PARTITIONS["$p"]}" "$TARGET""$p"
 done

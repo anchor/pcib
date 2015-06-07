@@ -21,6 +21,7 @@ declare -A locks
 
 lock() {
 	local lock="$1"
+	mkdir -p "$BASEDIR"/lock
 
 	locks[$lock]="$( (
 		if ! flock 9; then
@@ -35,7 +36,7 @@ lock() {
 			done
 		) &
 		echo $!
-	) 9>/tmp/.pcib-lock."$lock" )"
+	) 9>"$BASEDIR"/lock/"$lock" )"
 }
 
 unlock() {
