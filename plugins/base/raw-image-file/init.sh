@@ -1,36 +1,43 @@
-base_raw_image_file_usage() {
+# Copyright (c) 2015 Steven McDonald <steven@steven-mcdonald.id.au>
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+raw_image_file_usage() {
 	usage_section "Raw image file"
+	usage_description "Provides a raw-format image file."
 
-	usage_description \
-		"This plugin provides a raw image file for platform plugins to"  \
-		"work their magic in."
+	usage_option "--compress <alg>" \
+		"Compress the image using the specified algorithm."
 
-	usage_option "image-size" \
-		"Set the image size in GB."
+	usage_option "--image-basename <name>" \
+		"Required. The basename to use for the final image."
 
-	usage_option "image-dir" \
-		"Specify the directory to place resultant images in. (default:"  \
-		"\${basedir}/images)"
-
-	usage_option "image-basename" \
-		"Specify the basename to use for the image. This will have the"  \
-		"current date and time, as well as a .img extension appended."   \
-		"(default: avf)"
-
-	usage_option "compress" \
-		"The compression algorithm to use to compress the final image."  \
-		"(default: no compression)"
+	usage_option "--image-size <size>" \
+		"Required. The size of the image in GB."
 }
 
-register_usage base_raw_image_file_usage
-
-parseopt image-size true 3
-parseopt image-dir true "$BASEDIR"/images
-parseopt image-basename true avf
-parseopt compress true
-
-compress="$(optval compress)" || :
-case "$compress" in
+parseopt compress true ""
+case "$(optval compress)" in
 	""|bzip2) ;;
-	*) fatal "Unsupported compression algorithm: $compress" ;;
+	*) fatal "Unsupported compression algorithm: $(optval compress)" ;;
 esac
+
+parseopt image-basename true
+if ! optval image-basename &>/dev/null; then
+	fatal "No image-basename provided."
+fi
+
+parseopt image-size true
+if ! optval image-size &>/dev/null; then
+	fatal "No image-size provided."
+fi
