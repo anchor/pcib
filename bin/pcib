@@ -72,6 +72,10 @@ if optval help &>/dev/null; then
 	exit 0
 fi
 
+if [ "${#ARGV[@]}" -gt 0 -o "${#CONFIG_ARGV[@]}" -gt 0 ]; then
+	fatal "Unrecognised arguments: ${ARGV[*]} ${CONFIG_ARGV[*]}"
+fi
+
 trap 'error "An error occurred. Cleaning up..."; run_cleanups' EXIT
 
 run_tasks
