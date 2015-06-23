@@ -12,6 +12,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+mkdir -p "$BASEDIR"/images
+
 imagename="$(optval image-basename)"-"$(date +%Y%m%d-%H%M%S)"
 imagepath="$BASEDIR"/images/"$imagename"
 
