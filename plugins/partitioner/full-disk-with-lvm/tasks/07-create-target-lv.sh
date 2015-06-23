@@ -3,8 +3,6 @@ cleanup_lvm() {
 	unlock "$lvm_lock"
 }
 
-register_cleanup cleanup_lvm
-
 debug "Loopback device is $BLOCK_DEVICE"
 
 pvcreate "${PARTITIONS[/]}" |& logpipe "pvcreate"
@@ -13,6 +11,8 @@ pvcreate "${PARTITIONS[/]}" |& logpipe "pvcreate"
 # simultaneously.
 lvm_lock="lvm:$(optval vgname)"
 lock "$lvm_lock"
+
+register_cleanup cleanup_lvm
 vgcreate "$(optval vgname)" "${PARTITIONS[/]}" |& logpipe "vgcreate"
 
 lvcreate -L "$(optval lvsize)" -n "$(optval lvname)" \
