@@ -1,1 +1,5 @@
+# Reserved for vendor- and site-local plugins.
+/plugins/vendor
+/plugins/site
+
 *.swp
