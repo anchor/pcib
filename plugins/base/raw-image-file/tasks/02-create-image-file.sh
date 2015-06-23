@@ -14,6 +14,6 @@
 
 IMAGE="$WORKSPACE"/image.raw
 
-if ! dd if=/dev/null of="$IMAGE" bs=1M seek="$(($(optval image-size)*1024))" status=none; then
+if ! dd if=/dev/null of="$IMAGE" bs=1M seek="$(($(optval image-size)*1024))" &>"$WORKSPACE"/build.log; then
 	fatal "Error creating image file."
 fi
