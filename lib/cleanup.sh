@@ -24,8 +24,12 @@ run_cleanups() {
 	debug "Running cleanups up to $target"
 
 	while [ -n "$cleanups" ]; do
-		local cleanup="${cleanups[-1]}"
-		unset cleanups[-1]
+		# "cleanups[-1]" is a bash-4ism, and doesn't even work correctly
+		# on all bash 4 versions. Calculating a positive index enables us
+		# to run on older systems.
+		local i=$((${#cleanups[@]}-1))
+		local cleanup="${cleanups[$i]}"
+		unset cleanups[$i]
 
 		debug "Running cleanup: $cleanup"
 		"$cleanup"
