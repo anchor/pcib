@@ -198,3 +198,8 @@ unmount_filesystem() {
 		umount -f "$mountpoint"
 	fi
 }
+
+is_mountpoint() {
+	# The root of an FFS filesystem always has inode number 2.
+	test "$(stat -qf %i "$1")" = 2
+}

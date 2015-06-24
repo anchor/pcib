@@ -43,3 +43,7 @@ unmount_filesystem() {
 		umount -lf "$mountpoint"
 	fi
 }
+
+is_mountpoint() {
+	mountpoint -q "$1"
+}

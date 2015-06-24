@@ -17,6 +17,7 @@ cleanup_mount_filesystems() {
 	readarray -t unmount_order < <(perl -e 'print join "\n", sort { length $b <=> length $a } @ARGV' "${!PARTITIONS[@]}")
 
 	for p in "${unmount_order[@]}"; do
+		is_mountpoint "$TARGET""$p" || continue
 		unmount_filesystem "$TARGET""$p" "$unmount_safely"
 	done
 }
