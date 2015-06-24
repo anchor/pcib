@@ -29,7 +29,7 @@ run_cleanups() {
 		# to run on older systems.
 		local i=$((${#cleanups[@]}-1))
 		local cleanup="${cleanups[$i]}"
-		unset cleanups[$i]
+		unset "cleanups[$i]"
 
 		debug "Running cleanup: $cleanup"
 		"$cleanup"

@@ -16,6 +16,7 @@
 
 set -e
 set -o pipefail
+shopt -s nullglob
 
 # Asking "where is my binary located?" is inherently non-portable in
 # shell. This implementation uses only base perl modules, which should

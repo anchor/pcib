@@ -24,15 +24,15 @@ parseopt() {
 	if [ -n "$def" ]; then
 		OPTS["$opt"]="$def"
 	else
-		unset OPTS["$opt"]
+		unset "OPTS[$opt]"
 	fi
 
 	for i in "${!ARGV[@]}"; do
 		if [ "${ARGV[$i]}" = --"$opt" ]; then
-			unset ARGV[$i]
+			unset "ARGV[$i]"
 			if [ "$val" = true ]; then
 				OPTS["$opt"]="${ARGV[$(($i+1))]}"
-				unset ARGV[$(($i+1))]
+				unset "ARGV[$(($i+1))]"
 			else
 				OPTS["$opt"]=y
 			fi
@@ -42,10 +42,10 @@ parseopt() {
 
 	for i in "${!CONFIG_ARGV[@]}"; do
 		if [ "${CONFIG_ARGV[$i]}" = --"$opt" ]; then
-			unset CONFIG_ARGV[$i]
+			unset "CONFIG_ARGV[$i]"
 			if [ "$val" = true ]; then
 				OPTS["$opt"]="${CONFIG_ARGV[$(($i+1))]}"
-				unset CONFIG_ARGV[$(($i+1))]
+				unset "CONFIG_ARGV[$(($i+1))]"
 			else
 				OPTS["$opt"]=y
 			fi
