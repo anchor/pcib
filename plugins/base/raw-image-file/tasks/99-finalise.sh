@@ -14,7 +14,7 @@
 
 mkdir -p "$BASEDIR"/images
 
-imagename="$(optval image-basename)"-"$(date +%Y%m%d-%H%M%S)"
+imagename="$(optval image-basename)"-"$(date +%Y%m%d-%H%M%S)".img
 imagepath="$BASEDIR"/images/"$imagename"
 
 case "$(optval compress)" in
