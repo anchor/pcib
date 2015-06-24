@@ -13,6 +13,8 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 cleanup_mount_filesystems() {
+	[ "$unmount_safely" = safe ] || warning "Performing unsafe unmounts."
+
 	local unmount_order
 	readarray -t unmount_order < <(perl -e 'print join "\n", sort { length $b <=> length $a } @ARGV' "${!PARTITIONS[@]}")
 
