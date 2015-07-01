@@ -20,6 +20,15 @@
 # moved here.
 
 install_package_containing() {
+	local error
+	if [ "$1" = -q ]; then
+		# If we've been asked for silence, turn errors into debugs.
+		error=debug
+		shift
+	else
+		error=error
+	fi
+
 	# Run cheap tests first; if a file we want already exists, we can
 	# skip all of the below (and apt-file is sloooooowwwww). This is
 	# also more correct; if we are provided with more than one file, and
@@ -43,14 +52,14 @@ install_package_containing() {
 		fi
 	done
 
-	error "No package found for any of: $*"
+	"$error" "No package found for any of: $*"
 	return 1
 }
 
 install_package_providing() {
 	for cmd in "$@"; do
 		debug "Looking for a package providing command '$cmd'"
-		if install_package_containing $(expand_command_path "$cmd"); then
+		if install_package_containing -q $(expand_command_path "$cmd"); then
 			return 0
 		fi
 	done
