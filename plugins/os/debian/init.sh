@@ -108,6 +108,8 @@ dhcp_interface() {
 	local if="$1"
 	local filename=/etc/network/interfaces
 
+	install_package_providing dhclient
+
 	# Older Debians don't have /etc/network/interfaces.d.
 	if [ "$release_version" -ge 8 ]; then
 		filename=/etc/network/interfaces.d/"$(echo -n "$if" | perl -pe 's/[^\w\-]/_/g')"

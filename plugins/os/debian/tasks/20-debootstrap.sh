@@ -10,6 +10,7 @@ esac
 
 if ! debootstrap  \
 	--arch "${OPTS[arch]}" \
+	--variant minbase \
 	"${include_args[@]}" \
 	"$release_name" \
 	"$TARGET" \
