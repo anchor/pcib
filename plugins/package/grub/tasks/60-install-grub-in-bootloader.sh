@@ -1,6 +1,7 @@
 cleanup_grub1_install() {
 	kpartx -d /dev/mapper/hda
 	dmsetup remove hda
+	unlock grub1:install
 }
 
 if run_in_target which grub2-install &>/dev/null; then
@@ -32,6 +33,7 @@ case "$(run_in_target "$grub_install" --version)" in
 		maj_num=$((0x$(stat -c %t "$BLOCK_DEVICE")))
 		min_num=$((0x$(stat -c %T "$BLOCK_DEVICE")))
 
+		lock grub1:install
 		echo "0 $blocks linear $maj_num:$min_num 0" | dmsetup create hda
 		kpartx -a /dev/mapper/hda
 
@@ -46,6 +48,7 @@ case "$(run_in_target "$grub_install" --version)" in
 		fi
 
 		run_in_target "$grub_install" /dev/mapper/hda >/dev/null 2>&1
+		run_cleanups cleanup_grub1_install
 
 		# Replace with a real device.map
 		echo "(hd0) /dev/vda" >"$TARGET""$_boot_grub"/device.map
