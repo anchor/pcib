@@ -1,29 +1,28 @@
 cleanup_lvm() {
-	vgchange -an "$(optval vgname)" &>/dev/null
-	unlock "$lvm_lock"
+	vgchange -an "$vgname" &>/dev/null
 }
 
 debug "Loopback device is $BLOCK_DEVICE"
 
 pvcreate "${PARTITIONS[/]}" |& logpipe "pvcreate"
 
-# Avoid trying to build multiple images with the same VG name
-# simultaneously.
-lvm_lock="lvm:$(optval vgname)"
-lock "$lvm_lock"
+# In order to allow multiple image builds to run simultaneously, use a
+# random temporary VG name for the build. We'll rename it to
+# $(optval vgname) later, in a brief serialised portion of the build.
+vgname="$(mktemp -u pcib.XXXXXX)"
 
 register_cleanup cleanup_lvm
-vgcreate "$(optval vgname)" "${PARTITIONS[/]}" |& logpipe "vgcreate"
+vgcreate "$vgname" "${PARTITIONS[/]}" |& logpipe "vgcreate"
 
 lvcreate -L "$(optval lvsize)" -n "$(optval lvname)" \
-	"$(optval vgname)" |& logpipe "lvcreate root"
+	"$vgname" |& logpipe "lvcreate root"
 
 # Has another plugin requested a place to mkswap?
 if [ "$WANT_SWAP" = y ]; then
-	lvcreate -L "$SWAP_SIZE" -n swap "$(optval vgname)" \
+	lvcreate -L "$SWAP_SIZE" -n swap "$vgname" \
 		|& logpipe "lvcreate swap"
-	SWAP_DEVICE="$(lvm_device_path "$(optval vgname)" swap)"
+	SWAP_DEVICE="$(lvm_device_path "$vgname" swap)"
 fi
 
 declare -A PARTITIONS
-PARTITIONS[/]="$(lvm_device_path "$(optval vgname)" "$(optval lvname)")"
+PARTITIONS[/]="$(lvm_device_path "$vgname" "$(optval lvname)")"

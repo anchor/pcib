@@ -15,7 +15,7 @@
 # This is necessary because mkfs doesn't trigger udev to repopulate
 # /dev/disk/by-uuid, which causes hassles down the line when GRUB hard
 # codes our bootstrap device name into its config.
-vgchange -an "$(optval vgname)" &>/dev/null
+vgchange -an "$vgname" &>/dev/null
 kpartx -d "$BLOCK_DEVICE" &>/dev/null
 kpartx -a "$BLOCK_DEVICE" &>/dev/null
-vgchange -ay "$(optval vgname)" &>/dev/null
+vgchange -ay "$vgname" &>/dev/null
