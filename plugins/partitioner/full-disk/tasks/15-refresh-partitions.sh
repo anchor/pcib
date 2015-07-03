@@ -17,3 +17,5 @@
 # codes our bootstrap device name into its config.
 kpartx -d "$BLOCK_DEVICE" &>/dev/null
 kpartx -a "$BLOCK_DEVICE" &>/dev/null
+# Give udev time to react.
+sleep 1

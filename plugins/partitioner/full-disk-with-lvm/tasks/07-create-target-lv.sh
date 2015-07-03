@@ -1,5 +1,7 @@
 cleanup_lvm() {
 	vgchange -an "$vgname" &>/dev/null
+	# Give udev time to react.
+	sleep 1
 }
 
 debug "Loopback device is $BLOCK_DEVICE"

@@ -1,6 +1,8 @@
 cleanup_grub1_install() {
 	kpartx -d /dev/mapper/hda
 	dmsetup remove hda
+	# Give udev time to react.
+	sleep 1
 	unlock grub1:install
 }
 
@@ -36,6 +38,8 @@ case "$(run_in_target "$grub_install" --version)" in
 		lock grub1:install
 		echo "0 $blocks linear $maj_num:$min_num 0" | dmsetup create hda
 		kpartx -a /dev/mapper/hda
+		# Give udev time to react.
+		sleep 1
 
 		# Setup some dummy files
 		echo "(hd0) /dev/mapper/hda" >"$TARGET""$_boot_grub"/device.map

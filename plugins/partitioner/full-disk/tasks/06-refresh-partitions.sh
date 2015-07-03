@@ -14,11 +14,15 @@
 
 cleanup_refresh_partitions() {
 	kpartx -d "$BLOCK_DEVICE"
+	# Give udev time to react.
+	sleep 1
 }
 
 register_cleanup "cleanup_refresh_partitions"
 
 kpartx -a "$BLOCK_DEVICE"
+# Give udev time to react.
+sleep 1
 
 # kpartx has a nasty habit of putting all its partitions under /dev/mapper,
 # which, of course, the partitioner isn't expected to know.  So, we need to
