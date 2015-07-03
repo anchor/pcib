@@ -1,4 +1,25 @@
 remunge_defaults=
+
+# This is a workaround for the fact that partitioner/full-disk-with-lvm
+# uses a temporary VG name for the build to enable parallelism, and we
+# want the image to end up with the final VG name.
+case "$(run_in_target "$grub_install" --version)" in
+	*\ 1.99*|*\ 2.*)
+		if optval lvname >/dev/null; then
+			echo GRUB_DEVICE="$(lvm_device_path "$(optval vgname)" "$(optval lvname)")" >>"$TARGET"/etc/default/grub
+			# If GRUB "detects" that the path we've given it isn't an LVM
+			# path, it will use the UUID of the mounted root filesystem
+			# instead.
+			echo GRUB_DISABLE_LINUX_UUID=true >>"$TARGET"/etc/default/grub
+			remunge_defaults=y
+		fi
+		;;
+	*)
+		;;
+esac
+
+# This is a workaround for some older versions of GRUB2 which don't
+# correctly detect the root device's UUID in a chroot.
 case "$(run_in_target "$grub_install" --version)" in
 	*\ 1.99*)
 		if ! optval lvname >/dev/null; then
@@ -57,5 +78,5 @@ else
 fi
 
 if [ -n "$remunge_defaults" ]; then
-	sed -i '/^GRUB_DEVICE_UUID=/d' "$TARGET"/etc/default/grub
+	sed -i '/^GRUB_DEVICE=/d;/^GRUB_DEVICE_UUID=/d;/^GRUB_DISABLE_LINUX_UUID=/d' "$TARGET"/etc/default/grub
 fi
