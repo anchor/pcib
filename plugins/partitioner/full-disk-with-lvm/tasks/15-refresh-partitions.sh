@@ -19,3 +19,7 @@ vgchange -an "$vgname" &>/dev/null
 kpartx -d "$BLOCK_DEVICE" &>/dev/null
 kpartx -a "$BLOCK_DEVICE" &>/dev/null
 vgchange -ay "$vgname" &>/dev/null
+
+# This is a bit of a hack to make /etc/fstab come out with the right VG
+# name, as we've allocated a temporary one in 07-create-target-lv.sh.
+[ -z "$WANT_SWAP" ] || SWAP_DEVICE="$(lvm_device_path "$(optval vgname)" swap)"
