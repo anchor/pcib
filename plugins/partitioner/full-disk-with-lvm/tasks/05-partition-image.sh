@@ -1,6 +1,6 @@
 sfdisk -f -u S "$BLOCK_DEVICE" <<EOF >/dev/null 2>&1
-2048,204801,83
-206849,,8e
+2048,514047,83
+516095,,8e
 EOF
 
 declare -A PARTITIONS
