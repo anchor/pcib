@@ -14,6 +14,7 @@
 
 cleanup_yum_bootstrap() {
 	[ -z "$yum_repos_file" ] || rm -f "$yum_repos_file"
+	[ -z "$yum_repos_base" ] || rm -rf "$TARGET"/var/cache/yum/"$yum_repos_base"*
 }
 
 register_cleanup cleanup_yum_bootstrap
