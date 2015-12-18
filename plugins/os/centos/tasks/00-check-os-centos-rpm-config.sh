@@ -12,21 +12,15 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-# Packages installed from outside the chroot using --installroot don't
-# end up in the chroot's RPM database, so reinstall those now that we
-# have a working chrooted yum.
+# Some distributions (e.g., Debian) patch rpm to use a database
+# elsewhere than /var/lib/rpm by default. This causes yum to bootstrap
+# CentOS with its rpm database in the wrong place, causing the new OS
+# to believe that it has no packages installed.
+#
+# Since there's no way to override an rpm macro through yum, fail hard
+# if %_dbpath is set to something unexpected.
 
-if ! run_in_target yum -y install  \
-	/etc/redhat-release             \
-	/usr/bin/yum                    \
-	--releasever="$release_version" |&
-	tee "$WORKSPACE"/yum_output2    |
-	spin "Bootstrapping yum (phase 2)"
-then
-	error "Yum bootstrap phase 2 failed:"
-	cat "$WORKSPACE"/yum_output2
-	exit 1
-fi
+rpm_dbpath="$(rpm -E %_dbpath)"
 
-# Make sure only the repos we've configured exist.
-install_yum_repos
+[ "$rpm_dbpath" = /var/lib/rpm ] ||
+	fatal "RPM database is $rpm_dbpath (must be /var/lib/rpm)."
