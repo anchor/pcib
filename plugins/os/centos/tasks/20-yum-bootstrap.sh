@@ -12,28 +12,6 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-cleanup_yum_bootstrap() {
-	[ -z "$yum_repos_file" ] || rm -f "$yum_repos_file"
-	[ -z "$yum_repos_base" ] || rm -rf "$TARGET"/var/cache/yum/"$yum_repos_base"*
-}
-
-register_cleanup cleanup_yum_bootstrap
-
-yum_repos_file="$(mktemp /etc/yum/repos.d/centos-"$release_version"-XXXX.repo)"
-yum_repos_base="$(basename "$yum_repos_file" | sed 's/\.repo$//')"
-
-cat >"$yum_repos_file" <<EOF
-[$yum_repos_base-base]
-name=$yum_repos_base-base
-baseurl=$(optval mirror)/$release_version/os/$(optval arch)/
-enabled=0
-
-[$yum_repos_base-updates]
-name=$yum_repos_base-updates
-baseurl=$(optval mirror)/$release_version/updates/$(optval arch)/
-enabled=0
-EOF
-
 # /var/run needs to be a symlink to /run on CentOS >= 7.
 if [ "$release_version" -ge 7 ]; then
 	# Some (old) versions of yum will create all parent directories of
@@ -49,8 +27,7 @@ if ! yum -y install                                       \
 	/etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-"$release_version" \
 	/etc/redhat-release                                    \
 	--installroot="$TARGET"                                \
-	--enablerepo="$yum_repos_base"-base                    \
-	--enablerepo="$yum_repos_base"-updates                 |&
+	"${yum_repos_args[@]}"                                 |&
 	tee "$WORKSPACE"/yum_output                            |
 	spin "Bootstrapping yum"
 then
