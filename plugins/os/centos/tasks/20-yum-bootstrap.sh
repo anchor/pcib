@@ -34,6 +34,16 @@ baseurl=$(optval mirror)/$release_version/updates/$(optval arch)/
 enabled=0
 EOF
 
+# /var/run needs to be a symlink to /run on CentOS >= 7.
+if [ "$release_version" -ge 7 ]; then
+	# Some (old) versions of yum will create all parent directories of
+	# the yum lockfile regardless.
+	mkdir -p "$TARGET"/var "$TARGET"/run ||
+		fatal "Unable to ensure /var and /run exist"
+	ln -sfn ../run "$TARGET"/var/run ||
+		fatal "Unable to ensure /var/run -> /run"
+fi
+
 if ! yum -y install                                       \
 	/usr/bin/yum                                           \
 	/etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-"$release_version" \
