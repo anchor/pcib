@@ -234,7 +234,7 @@ fi
 set -A _REL -- $(sysctl -n kern.version | sed 's/^OpenBSD \([0-9]\.[0-9]\)\([^ ]*\).*/\1 \2/;q')
 _REL_INT="$(echo ${_REL[0]} | tr -d '.')"
 _OPENUP_MINREL=56
-_OPENUP_VERSION=19
+_OPENUP_VERSION=21
 if [ -n "${_REL[1]}" -a "${_REL[1]}" != "-stable" ]; then _badrel=1; fi
 if [ "${_REL_INT}" -lt "${_OPENUP_MINREL}" ]; then _badrel=1; fi
 if [ -n "${_badrel}" ]; then
