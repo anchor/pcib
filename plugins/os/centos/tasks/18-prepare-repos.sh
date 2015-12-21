@@ -28,7 +28,6 @@ yum_repos_args=()
 add_bootstrap_yum_repo() {
 	local name="$1"
 	local url="$2"
-	local prio="$3"
 
 	[ -n "$name" ] || fatal "A yum repo needs a name."
 	[ -n "$url" ]  || fatal "A yum repo needs a URL."
@@ -40,10 +39,8 @@ add_bootstrap_yum_repo() {
 		name=$yum_repos_base-$name
 		baseurl=$url
 		enabled=0
-		EOF
 
-	[ -z "$prio" ] || echo "priority=$prio" >>"$yum_repos_file"
-	echo >>"$yum_repos_file"
+		EOF
 }
 
 add_bootstrap_yum_repo base \
