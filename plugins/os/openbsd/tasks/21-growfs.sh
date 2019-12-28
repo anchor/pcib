@@ -38,5 +38,6 @@ cp /usr/src/distrib/amd64/ramdisk_growfs/bsd.rd "$TARGET"/bsd.gf
 unlock growfs
 
 cat >"$TARGET"/etc/boot.conf <<EOF
+set tty com0
 boot hd0a:/bsd.gf
 EOF
