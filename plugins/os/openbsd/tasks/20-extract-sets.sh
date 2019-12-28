@@ -16,11 +16,7 @@ for set in $sets; do
 	tar -xzphC "$TARGET" -f "$SETDIR"/"$set"
 done
 
-# As of OpenBSD 5.7, configuration is provided in tarballs under
-# /usr/share/sysmerge in the base set rather than as a separate etc
-# set.
-if [ "$release" -ge 57 ]; then
-	for conf in "$TARGET"/usr/share/sysmerge/*etc.tgz; do
-		tar -xzphC "$TARGET" -f "$conf"
-	done
-fi
+for dir in /var/sysmerge /usr/share/sysmerge; do
+    test -d $dir || continue
+    find $dir -name '*.tgz' -exec tar -xzphC "$TARGET" -f {} \;
+done

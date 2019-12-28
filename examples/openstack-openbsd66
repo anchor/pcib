@@ -1,0 +1,15 @@
+os=openbsd
+mirror=http://mirror.csclub.uwaterloo.ca/pub/OpenBSD
+arch=amd64
+release=6.6
+
+plugin=base/bootable
+dhcp-interface=vio0
+
+plugin=base/raw-image-file
+image-basename=openstack-openbsd66
+image-size=2
+
+plugin=partitioner/disklabel
+plugin=fs/ffs
+plugin=package/sshd

@@ -15,13 +15,14 @@
 # Only one kernel build at a time, thanks.
 lock growfs
 
-rm -rf /usr/src/distrib/amd64/ramdisk_growfs /usr/src/distrib/special/growfs
+#rm -rf /usr/src/distrib/amd64/ramdisk_growfs /usr/src/distrib/special/growfs
 cp -r \
 	"$(plugin_file os/openbsd usr/src/distrib/amd64/ramdisk_growfs)" \
 	/usr/src/distrib/amd64/
 cp -r \
 	"$(plugin_file os/openbsd usr/src/distrib/special/growfs)" \
 	/usr/src/distrib/special/
+cp -r /usr/src/distrib/amd64/ramdiskA/list /usr/src/distrib/amd64/ramdisk_growfs
 
 rm -rf /usr/obj/*
 (cd /usr/src && make obj 2>&1) |
@@ -30,7 +31,7 @@ rm -rf /usr/obj/*
 (cd /usr/src/distrib/special && make 2>&1) |
 	spin "Installing distribution tools"
 
-(cd /usr/src/distrib/amd64/ramdisk_growfs && make 2>&1) |
+(cd /usr/src/distrib/amd64/ramdisk_growfs && make bsd.rd 2>&1) |
 	spin "Building growfs ramdisk kernel"
 
 cp /usr/src/distrib/amd64/ramdisk_growfs/bsd.rd "$TARGET"/bsd.gf

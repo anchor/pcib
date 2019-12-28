@@ -74,11 +74,11 @@ EOF
 echo "done."
 
 echo -n "growing filesystem: "
-growfs -qys "$size" /dev/"$disk$dpart" >/dev/null
+growfs -qys "$size" /dev/"$disk$dpart"
 echo "done."
 
 echo -n "checking filesystem: "
-fsck -y /dev/"$disk$dpart" >/dev/null
+fsck_ffs -y /dev/"$disk$dpart" || sh
 echo "done."
 
 echo "rebooting system..."
