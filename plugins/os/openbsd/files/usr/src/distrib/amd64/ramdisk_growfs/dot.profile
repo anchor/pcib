@@ -22,7 +22,9 @@ umask 022
 # Make sure we can write to /tmp by just mounting / read-write.
 mount -u /dev/rd0a /
 
-disk=sd0
+for disk in sd0 wd0; do
+    fdisk -v ${disk} && break
+done
 fpart=3
 dpart=a
 echo "growing filesystem on disk ${disk}"
