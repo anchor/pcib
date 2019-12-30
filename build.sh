@@ -1,7 +1,32 @@
 #!/bin/bash
 # entry-point for the Cloud-Init BSD CI
 
+version=$1
+
+if [ -z "${version}" ]; then
+    echo "Usage: $0 version"
+    exit 1
+fi
+
+echo "os=openbsd
+mirror=http://mirror.csclub.uwaterloo.ca/pub/OpenBSD
+arch=amd64
+release=${version}
+
+plugin=base/bootable
+dhcp-interface=vio0
+
+plugin=base/raw-image-file
+image-basename=openstack-openbsd${version}
+image-size=2
+
+plugin=partitioner/disklabel
+plugin=package/cloud-init
+plugin=fs/ffs
+plugin=package/sshd" > /tmp/openstack-openbsd
+
+
 mkdir -p ~/builder
 sudo mkdir -p /var/cache/pcib
-sudo ./bin/pcib --config examples/openstack-openbsd66
-mv /var/cache/pcib/images/openstack-openbsd66-*.img ~/builder/final.raw
+sudo ./bin/pcib --config /tmp/openstack-openbsd
+mv /var/cache/pcib/images/openstack-openbsd*.img ~/builder/final.raw
