@@ -1,1 +1,1 @@
-echo "$(optval mirror)" > $TARGET/etc/installurl
+echo "https://cdn.openbsd.org/pub/OpenBSD" > $TARGET/etc/installurl
