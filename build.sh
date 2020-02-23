@@ -1,12 +1,19 @@
 #!/bin/bash
 # entry-point for the Cloud-Init BSD CI
-
 version=$1
-
-if [ -z "${version}" ]; then
-    echo "Usage: $0 version"
-    exit 1
+repo=$2
+ref=$3
+if [ -z "$version" ]; then
+    version="12.1"
 fi
+if [ -z "${repo}" ]; then
+    repo="canonical/cloud-init"
+fi
+if [ -z "${ref}" ]; then
+    ref="master"
+fi
+set -eux
+
 
 echo "os=openbsd
 mirror=http://mirror.csclub.uwaterloo.ca/pub/OpenBSD
