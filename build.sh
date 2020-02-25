@@ -3,6 +3,7 @@
 version=$1
 repo=$2
 ref=$3
+debug=$4
 if [ -z "$version" ]; then
     version="12.1"
 fi
@@ -11,6 +12,9 @@ if [ -z "${repo}" ]; then
 fi
 if [ -z "${ref}" ]; then
     ref="master"
+fi
+if [ -z "${debug}" ]; then
+    debug=""
 fi
 set -eux
 
