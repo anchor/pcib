@@ -152,6 +152,8 @@ uo_addfile() {
 
 	uo_verbose "adding response file: ${dest}: ${src}"
 
+	# Since 6.9, bsd.rd is gzipped
+	gunzip < ${WRKDIR}/bsd.rd > /tmp/bsd.rd2 && mv /tmp/bsd.rd2 ${WRKDIR}/bsd.rd
 	# extract ramdisk from bsd.rd
 	rdsetroot -x "${WRKDIR}/bsd.rd" "${WRKDIR}/ramdisk"
 
@@ -200,6 +202,8 @@ uo_addfile() {
 
 	# put ramdisk back in bsd.rd
 	rdsetroot "${WRKDIR}/bsd.rd" "${WRKDIR}/ramdisk"
+	gzip "${WRKDIR}/bsd.rd"
+	mv "${WRKDIR}/bsd.rd.gz" "${WRKDIR}/bsd.rd"
 }
 
 uo_output() {
