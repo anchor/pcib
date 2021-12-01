@@ -16,6 +16,6 @@
 
 ksh "$(plugin_file os/openbsd upobsd.sh)" -P "$(plugin_file os/openbsd usr/src/distrib/amd64/ramdisk_growfs/dot.profile)" -o "$TARGET"/bsd.gf
 cat >"$TARGET"/etc/boot.conf <<EOF
-set tty com0
+#set tty com0
 boot hd0a:/bsd.gf
 EOF
