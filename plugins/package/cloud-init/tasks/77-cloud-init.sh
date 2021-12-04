@@ -1,6 +1,6 @@
 OS_VERSION=$(sysctl -n kern.osrelease)
 
-git clone -b master http://github.com/goneri/cloud-init $TARGET/tmp/cloud-init
+git clone -b main http://github.com/goneri/cloud-init $TARGET/tmp/cloud-init
 
 echo 'nameserver 8.8.8.8' > $TARGET/etc/resolv.conf
 
