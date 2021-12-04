@@ -23,11 +23,12 @@ done
 chroot $TARGET ldconfig /usr/local/lib
 PKG_PATH="https://mirror.csclub.uwaterloo.ca/pub/OpenBSD/${OS_VERSION}/packages/amd64/" chroot $TARGET sh -c 'cd /tmp/cloud-init; ./tools/build-on-openbsd'
 
-gsed -i "/^echo 'starting network'/i \/usr\/local\/bin\/cloud-init --debug init -l" $TARGET/etc/rc
-gsed -i "/^reorder_libs$/i \/usr\/local\/bin\/cloud-init --debug init" $TARGET/etc/rc
-gsed -i "/.*rc.local.*/i \/usr\/local\/bin\/cloud-init --debug modules --mode config" $TARGET/etc/rc
-gsed -i "/^date/i \/usr\/local\/bin\/cloud-init --debug modules --mode final" $TARGET/etc/rc
-
-cat $TARGET/etc/rc
+echo "#!/bin/sh" > $TARGET/etc/rc.local
+echo "/usr/local/bin/cloud-init init -l" >> $TARGET/etc/rc.local
+echo "/usr/local/bin/cloud-init init" >> $TARGET/etc/rc.local
+echo "/usr/local/bin/cloud-init modules --mode config" >> $TARGET/etc/rc.local
+echo "/usr/local/bin/cloud-init modules --mode final" >> $TARGET/etc/rc.local
+cat /var/log/cloud-init.log > /dev/tty00
+echo "exit 0" >> $TARGET/etc/rc.local
 
 rm -r $TARGET/tmp/cloud-init
