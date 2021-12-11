@@ -45,7 +45,7 @@ echo "calculated new partition size: ${size}"
 # loop.
 echo -n "removing boot.conf: "
 mount /dev/"$disk$dpart" /mnt
-echo "" > /mnt/etc/boot.conf
+echo "set tty com0" > /mnt/etc/boot.conf
 umount /mnt
 echo "done."
 
