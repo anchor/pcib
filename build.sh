@@ -20,7 +20,7 @@ set -eux
 
 
 echo "os=openbsd
-mirror=http://mirror.csclub.uwaterloo.ca/pub/OpenBSD
+mirror=https://openbsd.cs.toronto.edu/pub/OpenBSD
 arch=amd64
 release=${version}
 

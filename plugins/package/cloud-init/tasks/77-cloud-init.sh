@@ -18,10 +18,10 @@ pkgs="
    sudo--
 "
 for pkg in ${pkgs}; do
-    PKG_PATH="https://mirror.csclub.uwaterloo.ca/pub/OpenBSD/${OS_VERSION}/packages/amd64/" chroot $TARGET pkg_add ${pkg}
+    PKG_PATH="https://openbsd.cs.toronto.edu/pub/OpenBSD/${OS_VERSION}/packages/amd64/" chroot $TARGET pkg_add ${pkg}
 done
 chroot $TARGET ldconfig /usr/local/lib
-PKG_PATH="https://mirror.csclub.uwaterloo.ca/pub/OpenBSD/${OS_VERSION}/packages/amd64/" chroot $TARGET sh -c 'cd /tmp/cloud-init; ./tools/build-on-openbsd'
+PKG_PATH="https://openbsd.cs.toronto.edu/pub/OpenBSD/${OS_VERSION}/packages/amd64/" chroot $TARGET sh -c 'cd /tmp/cloud-init; ./tools/build-on-openbsd'
 
 echo "#!/bin/sh" > $TARGET/etc/rc.local
 echo "/usr/local/bin/cloud-init init -l" >> $TARGET/etc/rc.local
