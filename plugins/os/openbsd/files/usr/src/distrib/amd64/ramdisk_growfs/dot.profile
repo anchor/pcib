@@ -22,7 +22,9 @@ umask 022
 # Make sure we can write to /tmp by just mounting / read-write.
 mount -u /dev/rd0a /
 
-disk=sd0
+for disk in sd0 wd0; do
+    fdisk -v ${disk} && break
+done
 fpart=3
 dpart=a
 echo "growing filesystem on disk ${disk}"
@@ -43,7 +45,8 @@ echo "calculated new partition size: ${size}"
 # loop.
 echo -n "removing boot.conf: "
 mount /dev/"$disk$dpart" /mnt
-rm -f /mnt/etc/boot.conf
+echo "set tty com0" > /mnt/etc/boot.conf
+echo "boot" >> /mnt/etc/boot.conf
 umount /mnt
 echo "done."
 
@@ -74,11 +77,11 @@ EOF
 echo "done."
 
 echo -n "growing filesystem: "
-growfs -qys "$size" /dev/"$disk$dpart" >/dev/null
+growfs -qys "$size" /dev/"$disk$dpart"
 echo "done."
 
 echo -n "checking filesystem: "
-fsck -y /dev/"$disk$dpart" >/dev/null
+fsck_ffs -y /dev/"$disk$dpart" || sh
 echo "done."
 
 echo "rebooting system..."

@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Anchor Systems Pty Ltd <support@anchor.com.au>
+# Copyright (c) 2019 Gon√ri Le bouder <goneri@lebouder.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -12,11 +12,13 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-for set in $sets; do
-	tar -xzphC "$TARGET" -f "$SETDIR"/"$set"
-done
+cloud_init_plugin_usage() {
+	usage_section "Cloud-Init instance initialization"
 
-for dir in /var/sysmerge /usr/share/sysmerge; do
-    test -d $dir || continue
-    find $dir -name '*.tgz' -exec tar -xzphC "$TARGET" -f {} \;
-done
+	usage_description \
+		"This plugin provides Cloud-Init support for" \
+		"configuring an instance for various Cloud providers."
+
+}
+
+register_usage cloud_init_plugin_usage
